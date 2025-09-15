@@ -66,7 +66,7 @@ export function Navbar() {
               </Button>
             )}
             
-            <Button variant="ghost" size="sm">
+            <Button variant="ghost" size="sm" onClick={() => navigate("/auth")}>
               <User className="h-5 w-5" />
             </Button>
 
