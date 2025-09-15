@@ -69,12 +69,12 @@ const AuthPage = () => {
         <Card className="bg-card/80 backdrop-blur-sm border-border shadow-[0_8px_30px_hsl(220_13%_4%_/_0.8)]">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl font-bold">
-              {isLogin ? 'Welcome Back' : 'Join CineReview'}
+              {isLogin ? 'Welcome Back' : 'Sign Up for CineReview'}
             </CardTitle>
             <CardDescription className="text-muted-foreground">
               {isLogin 
                 ? 'Sign in to your account to continue your movie journey' 
-                : 'Create your account and discover amazing movies'
+                : 'Create your account to review and discover amazing movies'
               }
             </CardDescription>
           </CardHeader>

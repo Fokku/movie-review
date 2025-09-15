@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import MovieDetail from "./pages/MovieDetail";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
+import Movies from "./pages/Movies";
 
 const queryClient = new QueryClient();
 
@@ -22,6 +23,7 @@ const App = () => (
           <Route path="/auth" element={<Auth />} /> 
           <Route path="/login" element={<Auth />} /> 
           <Route path="/signup" element={<Auth />} /> 
+          <Route path="/movies" element={<Movies />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

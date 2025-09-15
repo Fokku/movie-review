@@ -28,7 +28,7 @@ export function Navbar() {
             <Button variant="ghost" onClick={() => navigate("/")}>
               Home
             </Button>
-            <Button variant="ghost">
+            <Button variant="ghost" onClick={() => navigate("/Movies")}>
               Movies
             </Button>
             <Button variant="ghost">
