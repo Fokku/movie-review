@@ -1,11 +1,13 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Film, User, Menu } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Search, Film, User, Menu, Bookmark } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export function Navbar() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [watchlistCount, setWatchlistCount] = useState(0); //watchlist count to be retrieved from db
   const navigate = useNavigate();
 
   return (
@@ -28,7 +30,7 @@ export function Navbar() {
             <Button variant="ghost" onClick={() => navigate("/")}>
               Home
             </Button>
-            <Button variant="ghost" onClick={() => navigate("/Movies")}>
+            <Button variant="ghost">
               Movies
             </Button>
             <Button variant="ghost">
@@ -65,6 +67,25 @@ export function Navbar() {
                 <Search className="h-5 w-5" />
               </Button>
             )}
+
+            {/* Watchlist Icon */}
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="relative"
+              onClick={() => navigate("/watchlist")}
+              title="My Watchlist"
+            >
+              <Bookmark className="h-5 w-5" />
+              {watchlistCount > 0 && (
+                <Badge 
+                  variant="destructive" 
+                  className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
+                >
+                  {watchlistCount > 99 ? '99+' : watchlistCount}
+                </Badge>
+              )}
+            </Button>
             
             <Button variant="ghost" size="sm" onClick={() => navigate("/auth")}>
               <User className="h-5 w-5" />
