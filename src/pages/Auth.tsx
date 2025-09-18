@@ -4,13 +4,18 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Film, Eye, EyeOff, Mail, Lock, User, ArrowLeft, Star } from 'lucide-react';
+import { Film, Eye, EyeOff, Mail, Lock, User, ArrowLeft, Star, AlertCircle } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
 
 const AuthPage = () => {
   const navigate = useNavigate();
+  const { login, signup } = useAuth();
+  const { toast } = useToast();
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -25,10 +30,71 @@ const AuthPage = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
-    // Add your authentication logic here
+    setIsLoading(true);
+
+    try {
+      // Validation
+      if (!formData.email || !formData.password) {
+        toast({
+          title: "Missing information",
+          description: "Please fill in all required fields.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      if (!isLogin) {
+        if (!formData.name) {
+          toast({
+            title: "Missing information", 
+            description: "Please enter your full name.",
+            variant: "destructive"
+          });
+          return;
+        }
+        
+        if (formData.password !== formData.confirmPassword) {
+          toast({
+            title: "Password mismatch",
+            description: "Passwords do not match.",
+            variant: "destructive"
+          });
+          return;
+        }
+      }
+
+      // Attempt authentication
+      let success = false;
+      if (isLogin) {
+        success = await login(formData.email, formData.password);
+      } else {
+        success = await signup(formData.email, formData.password, formData.name);
+      }
+
+      if (success) {
+        toast({
+          title: isLogin ? "Welcome back!" : "Account created!",
+          description: isLogin ? "You have successfully signed in." : "Your account has been created successfully."
+        });
+        navigate("/");
+      } else {
+        toast({
+          title: "Authentication failed",
+          description: "Please check your credentials and try again.",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleBackToHome = () => {
@@ -194,12 +260,29 @@ const AuthPage = () => {
               {/* Submit button */}
               <Button 
                 onClick={handleSubmit}
+                disabled={isLoading}
                 className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
                 size="lg"
               >
-                {isLogin ? 'Sign In' : 'Create Account'}
+                {isLoading ? 'Please wait...' : (isLogin ? 'Sign In' : 'Create Account')}
               </Button>
             </div>
+
+            {/* REMOVE IN PROD */}
+            {/* Demo credentials hint */}
+            {isLogin && (
+              <div className="bg-muted/50 border border-border rounded-lg p-3">
+                <div className="flex items-start gap-2">
+                  <AlertCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                  <div className="text-xs text-muted-foreground">
+                    <p className="font-medium text-foreground mb-1">Demo Credentials:</p>
+                    <p><strong>Email:</strong> kai@test.com</p>
+                    <p><strong>Password:</strong> demo123</p>
+                    <p className="mt-1">Or use any email/password to create a demo account.</p>
+                  </div>
+                </div>
+              </div>
+            )}
 
 
             {/* Toggle between login/signup */}

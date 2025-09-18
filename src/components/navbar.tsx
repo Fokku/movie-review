@@ -1,14 +1,26 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Search, Film, User, Menu, Bookmark } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Search, Film, User, Menu, LogOut, Settings } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 export function Navbar() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [watchlistCount, setWatchlistCount] = useState(0); //watchlist count to be retrieved from db
   const navigate = useNavigate();
+  const { user, logout, isAuthenticated } = useAuth();
+
+  const getInitials = (name: string) => {
+    return name.split(' ').map(n => n[0]).join('').toUpperCase();
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
@@ -67,29 +79,41 @@ export function Navbar() {
                 <Search className="h-5 w-5" />
               </Button>
             )}
-
-            {/* Watchlist Icon */}
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="relative"
-              onClick={() => navigate("/watchlist")}
-              title="My Watchlist"
-            >
-              <Bookmark className="h-5 w-5" />
-              {watchlistCount > 0 && (
-                <Badge 
-                  variant="destructive" 
-                  className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
-                >
-                  {watchlistCount > 99 ? '99+' : watchlistCount}
-                </Badge>
-              )}
-            </Button>
             
-            <Button variant="ghost" size="sm" onClick={() => navigate("/auth")}>
-              <User className="h-5 w-5" />
-            </Button>
+            {isAuthenticated ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="relative">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={user?.avatar} alt={user?.name} />
+                      <AvatarFallback className="text-xs">
+                        {user?.name ? getInitials(user.name) : 'U'}
+                      </AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <div className="px-2 py-1.5">
+                    <p className="text-sm font-medium">{user?.name}</p>
+                    <p className="text-xs text-muted-foreground">{user?.email}</p>
+                  </div>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => navigate("/profile")}>
+                    <Settings className="mr-2 h-4 w-4" />
+                    Profile Settings
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout} className="text-red-600">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button variant="ghost" size="sm" onClick={() => navigate("/auth")}>
+                <User className="h-5 w-5" />
+              </Button>
+            )}
 
             <Button variant="ghost" size="sm" className="md:hidden">
               <Menu className="h-5 w-5" />
