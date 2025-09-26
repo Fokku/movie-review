@@ -7,6 +7,7 @@ const bcrypt = require('bcryptjs');
 const { Resend } = require('resend');
 const cors = require('cors');
 require('dotenv').config();
+const userPreferencesRouter = require('./routes/userPreferences');
 
 const app = express();
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -17,6 +18,7 @@ app.use(cors({
     origin: process.env.FRONTEND_URL || 'http://localhost:8080',
     credentials: true
 }));
+app.use('/api/user-preferences', userPreferencesRouter);
 
 // Database connection
 const dbConfig = {
